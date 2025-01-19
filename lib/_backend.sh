@@ -463,57 +463,13 @@ backend_create_default_users() {
 
   sleep 2
     # Caminho do arquivo
-  local file_path="/home/deploy/$instancia/backend/src/database/seeds/20200904070005-create-default-users.ts"
-
-  # Verifica se a variável "urlprincipal_url" está definida
-  if [ -z "$urlprincipal_url" ]; then
-    printf "${RED}⚠️ A variável 'urlprincipal_url' não está definida. Defina-a antes de continuar.${NC}\n"
-    exit 1
-  fi
-
-  # Conteúdo que será escrito no arquivo
-  local content="import { QueryInterface } from "sequelize";
-
-
-module.exports = {
-  // ====================
-  // Função de Migração para Criar Usuário Padrão
-  // ====================
-  up: (queryInterface: QueryInterface) => {
-    return queryInterface.sequelize.query(
-      `
-        INSERT INTO public."Users" ("name", email, "passwordHash", "createdAt", "updatedAt", profile, "tokenVersion", "tenantId", "lastLogin", "lastLogout", "isOnline", configs, "lastOnline", status) VALUES
-	      ('Administrador', 'admin@$urlprincipal_url', '$2a$08$/wEAiCcLkfGcnzxCQprgYeFryP7MCOIbjcpRlWTPY/EQ/ON.gI0qS', '2020-11-07 17:28:29.832', '2022-11-04 17:14:32.711', 'admin', 0, 1, '2022-11-03 01:35:12.607', '2022-08-04 00:04:21.060', true, '{"filtrosAtendimento":{"searchParam":"","pageNumber":1,"status":["open","pending","closed"],"showAll":true,"count":null,"queuesIds":[],"withUnreadMessages":false,"isNotAssignedUser":false,"includeNotQueueDefined":true},"isDark":false}', '2022-11-04 17:14:32.711', 'offline');
-      `
-    ); // Insere um usuário padrão na tabela Users
-  },
-
-  // ====================
-  // Função de Reversão da Migração
-  // ====================
-  down: (queryInterface: QueryInterface) => {
-    return queryInterface.bulkDelete("Users", {}); // Remove todos os usuários da tabela Users
-  }
-};
-
-"
-
-  # Substitui ${urlprincipal_url} pelo valor da variável
-  content=${content//\$urlprincipal_url/$urlprincipal_url}
-
-  # Garante que o caminho do arquivo exista antes de tentar escrever
-  if [ ! -d "$(dirname "$file_path")" ]; then
-    printf "${RED}⚠️ O diretório do arquivo não existe: $(dirname "$file_path").${NC}\n"
-    exit 1
-  fi
-
-  # Executa o comando com sudo su - deploy para garantir permissões
-  sudo su - deploy -c "echo '$content' > '$file_path'"
-
-  printf "${GREEN}✔️ Arquivo atualizado com sucesso:${NC} ${BLUE}${file_path}${NC}\n"
+   adminuser="/home/deploy/${instancia}/bcakend/src/database/seeds/20200904070005-create-default-users.ts"
+  
+  sed -i "s/admin@whapichat\.com\.br/admin@${urlprincipal_url}/g" "$adminuser"
 
   sleep 2
 }
+
 
 
 #######################################
@@ -524,59 +480,12 @@ module.exports = {
 
 backend_fix_create_default_super() {
   print_banner
-  printf "${RED} 💻 Configurando permissão de login frontend...${NC}"
+  printf "${RED} 💻 Configurando permissão de login superuser...${NC}"
   printf "\n\n"
 
-  sleep 2
-   local file_path="/home/deploy/$instancia/backend/src/database/seeds/20240517000001-create-default-super.ts"
-
-  # Verifica se a variável "urlprincipal_url" está definida
-  if [ -z "$urlprincipal_url" ]; then
-    printf "${RED}⚠️ A variável 'urlprincipal_url' não está definida. Defina-a antes de continuar.${NC}\n"
-    exit 1
-  fi
-
-  # Conteúdo que será escrito no arquivo
-  local content="import { QueryInterface } from \"sequelize\";
-
-import { QueryInterface } from "sequelize";
-
-module.exports = {
-  // ====================
-  // Função de Migração para Criar um Usuário Super
-  // ====================
-  up: (queryInterface: QueryInterface) => {
-    return queryInterface.sequelize.query(
-      `
-        INSERT INTO public."Users" ("name", email, "passwordHash", "createdAt", "updatedAt", profile, "tokenVersion", "tenantId", "lastLogin", "lastLogout", "isOnline", configs, "lastOnline", status) VALUES
-	      ('Super', 'super@$urlprincipal_url', '$2a$08$/wEAiCcLkfGcnzxCQprgYeFryP7MCOIbjcpRlWTPY/EQ/ON.gI0qS', '2020-11-07 17:28:29.832', '2022-11-04 17:14:32.711', 'super', 0, 1, '2022-11-03 01:35:12.607', '2022-08-04 00:04:21.060', true, '{"filtrosAtendimento":{"searchParam":"","pageNumber":1,"status":["open","pending"],"showAll":true,"count":null,"queuesIds":[],"withUnreadMessages":false,"isNotAssignedUser":false,"includeNotQueueDefined":true},"isDark":false}', '2022-11-04 17:14:32.711', 'offline');
-      `
-    ); // Insere um novo usuário super na tabela Users
-  },
-
-  // ====================
-  // Função de Reversão da Migração
-  // ====================
-  down: (queryInterface: QueryInterface) => {
-    return queryInterface.bulkDelete("Users", {}); // Remove todos os usuários da tabela Users
-  }
-};
-
-"
-
-  # Substitui ${urlprincipal_url} pelo valor da variável
-  content=${content//\$urlprincipal_url/$urlprincipal_url}
-
-  # Garante que o caminho do arquivo exista antes de tentar escrever
-  if [ ! -d "$(dirname "$file_path")" ]; then
-    printf "${RED}⚠️ O diretório do arquivo não existe: $(dirname "$file_path").${NC}\n"
-    exit 1
-  fi
-
-  # Executa o comando com sudo su - deploy para garantir permissões
-  sudo su - deploy -c "echo '$content' > '$file_path'"
-
-  printf "${GREEN}✔️ Arquivo atualizado com sucesso:${NC} ${BLUE}${file_path}${NC}\n"
+  superuser="/home/deploy/${instancia}/bcakend/src/database/seeds/20240517000001-create-default-super.ts"
+  
+  sed -i "s/super@whapichat\.com\.br/super@${urlprincipal_url}/g" "$superuser"
 
   sleep 2
 }

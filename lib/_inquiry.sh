@@ -402,8 +402,8 @@ get_urls_arm64() {
   system_git_clone
   backend_set_env_arm64
   backend_fix_login
-  # backend_create_default_users
-  # backend_fix_create_default_super
+  backend_create_default_users
+  backend_fix_create_default_super
   backend_postgres_create
   backend_redis_create
   backend_rabbitmq_create
