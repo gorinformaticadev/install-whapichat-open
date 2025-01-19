@@ -196,7 +196,7 @@ get_deploy_pass() {
 
 get_rabbitmq_pass() {
   print_banner
-  printf "${BLUE} 🔐 Gerando automaticamente uma senha para o RabbitMQ...${NC}\n\n"
+  printf "${BLUE}🔐 Gerando automaticamente uma senha para o RabbitMQ...${NC}\n\n"
 
   # Gera uma senha aleatória de 12 caracteres alfanuméricos
   rabbitmq_pass=$(openssl rand -base64 12 | tr -d '/+=' | cut -c1-12)
@@ -204,11 +204,10 @@ get_rabbitmq_pass() {
   # Exibe a senha gerada
   printf "${GREEN}✔️ Senha do RabbitMQ gerada automaticamente:${NC} ${BLUE}${rabbitmq_pass}${NC}\n\n"
 
+  # Exporta a senha para que seja usada em outros scripts/processos
   export rabbitmq_pass
-
-  # Aguarda 2 segundos antes de continuar
-  #sleep 2
 }
+
 
 get_db_name() {
   print_banner

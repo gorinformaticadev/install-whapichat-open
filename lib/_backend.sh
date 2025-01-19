@@ -76,21 +76,25 @@ EOF
 
 backend_rabbitmq_create() {
   print_banner
-  printf "${RED} 💻 Criando rabbitmq...${NC}"
-  printf "\n\n"
+  printf "${RED}💻 Criando RabbitMQ...${NC}\n\n"
 
   sleep 2
 
+  # Usa a senha exportada na criação do container RabbitMQ
   sudo su - root <<EOF
   usermod -aG docker deploy
   docker run -d --name rabbitmq-${instancia} \
             -p 5672:5672 -p 15672:15672 \
             --restart=always --hostname rabbitmq \
-            -v /data:/var/lib/rabbitmq rabbitmq:3.11.5-management          
+            -v /data:/var/lib/rabbitmq \
+            -e RABBITMQ_DEFAULT_USER=a${instancia} \
+            -e RABBITMQ_DEFAULT_PASS=${rabbitmq_pass} \
+            rabbitmq:3.11.5-management
 EOF
 
   sleep 2
 }
+
 
 
 backend_portainer_create() {
@@ -197,8 +201,9 @@ MIN_SLEEP_INTERVAL=2000
 MAX_SLEEP_INTERVAL=5000
 
 # dados do RabbitMQ / Para não utilizar, basta comentar a var AMQP_URL
-# RABBITMQ_DEFAULT_PASS=${rabbitmq_pass}
-AMQP_URL='amqp://guest:guest@127.0.0.1:5672?connection_attempts=5&retry_delay=5'
+RABBITMQ_DEFAULT_USER=${instancia}
+RABBITMQ_DEFAULT_PASS=${rabbitmq_pass}
+AMQP_URL="amqp://${instancia}:${rabbitmq_pass}@127.0.0.1:5672?connection_attempts=5&retry_delay=5"
 
 # api oficial (integração em desenvolvimento)
 API_URL_360=https://waba-sandbox.360dialog.io
@@ -599,8 +604,9 @@ MIN_SLEEP_INTERVAL=2000
 MAX_SLEEP_INTERVAL=5000
 
 # dados do RabbitMQ / Para não utilizar, basta comentar a var AMQP_URL
-# ABBITMQ_DEFAULT_PASS=${rabbitmq_pass}
-AMQP_URL='amqp://guest:guest@127.0.0.1:5672?connection_attempts=5&retry_delay=5'
+RABBITMQ_DEFAULT_USER=${instancia}
+RABBITMQ_DEFAULT_PASS=${rabbitmq_pass}
+AMQP_URL="amqp://${instancia}:${rabbitmq_pass}@127.0.0.1:5672?connection_attempts=5&retry_delay=5"
 
 # api oficial (integração em desenvolvimento)
 API_URL_360=https://waba-sandbox.360dialog.io
