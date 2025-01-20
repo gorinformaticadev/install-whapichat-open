@@ -277,30 +277,45 @@ EOF
 #######################################
 system_certbot_install() {
   print_banner
-  printf "${CYAN_LIGHT} 💻 Instalando certbot e abrindo portas...${NC}"
-  printf "\n\n"
+  printf "${CYAN_LIGHT} 💻 Instalando certbot e configurando firewall...${NC}\n\n"
 
   sleep 2
 
   sudo su - root <<EOF
-  sudo apt-get install netfilter-persistent
-  sudo apt-get install iptables
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 80 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 443 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 3100 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 3000 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 5432 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 6379 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 5672 -j ACCEPT
-  sudo iptables -A INPUT -m state --state NEW -p tcp --dport 3333 -j ACCEPT
-  sudo netfilter-persistent save
-  apt-get remove certbot
-  snap install --classic certbot
-  ln -s /snap/bin/certbot /usr/bin/certbot
+  # Definir políticas padrão
+  echo "🔒 Configurando regras padrão do UFW..."
+  sudo ufw default deny incoming
+  sudo ufw default allow outgoing
+
+  # Abrir portas específicas
+  echo "📡 Permitindo conexões necessárias..."
+  sudo ufw allow ssh      # Porta 22
+  sudo ufw allow 5432     # PostgreSQL
+  sudo ufw allow 80       # HTTP
+  sudo ufw allow 443      # HTTPS
+  sudo ufw allow 6379     # Redis
+  sudo ufw allow 5672     # RabbitMQ
+  sudo ufw allow 9000     # Serviço específico
+  sudo ufw allow 3100     # Serviço específico
+  sudo ufw allow 3000     # Serviço específico
+  sudo ufw allow 3333     # Serviço específico
+
+  # Ativar o UFW
+  echo "🚀 Ativando o UFW..."
+  sudo ufw --force enable
+
+  # Instalação do Certbot
+  echo "⚙️ Instalando o Certbot..."
+  sudo apt-get remove -y certbot
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+  echo "✅ Configuração concluída!"
 EOF
 
   sleep 2
 }
+
 
 #######################################
 # renovar certbot
