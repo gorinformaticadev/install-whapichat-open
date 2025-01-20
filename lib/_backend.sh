@@ -352,6 +352,7 @@ cat > /etc/nginx/sites-available/$instancia-backend << 'END'
 
 server {
   server_name $backend_hostname;
+  listen 80;
 
   location / {
     proxy_pass http://127.0.0.1:${backend_porta};

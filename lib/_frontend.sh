@@ -168,6 +168,7 @@ sudo su - root << EOF
 cat > /etc/nginx/sites-available/$instancia-frontend << 'END'
 server {
     server_name $frontend_hostname;
+    listen 80;
   
     location / {
     proxy_pass http://127.0.0.1:${frontend_porta};
