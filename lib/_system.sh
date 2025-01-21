@@ -277,34 +277,70 @@ EOF
 #######################################
 system_certbot_install() {
   print_banner
-  printf "${CYAN_LIGHT} 💻 Instalando certbot e configurando firewall...${NC}\n\n"
+  printf "${WHITE} 💻 Agora, vamos instalar e ativar firewall UFW...${GRAY_LIGHT}"
+  printf "\n\n"
 
   sleep 2
 
   sudo su - root <<EOF
-  # Definir políticas padrão
-  echo "🔒 Configurando regras padrão do UFW..."
-  sudo ufw default deny incoming
-  sudo ufw default allow outgoing
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 22
+ufw allow 5432
+ufw allow 80
+ufw allow 443
+ufw allow 9000
+ufw --force enable
+echo "{\"iptables\": false}" > /etc/docker/daemon.json
+systemctl restart docker
+sed -i -e 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
+ufw reload
+wget -q -O /usr/local/bin/ufw-docker https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
+chmod +x /usr/local/bin/ufw-docker
+ufw-docker install
+systemctl restart ufw
 
-  # Abrir portas específicas
-  echo "📡 Permitindo conexões necessárias..."
-  sudo ufw allow ssh
-  sudo ufw allow 5432
-  sudo ufw allow 80
-  sudo ufw allow 443
-  sudo ufw allow 6379
-  sudo ufw allow 5672
-  sudo ufw allow 9000
-  sudo ufw allow 3100
-  sudo ufw allow 3000
-  sudo ufw allow 3333
+# Instalação do Certbot
+  echo "⚙️ Instalando o Certbot..."
+  sudo apt-get remove -y certbot
+  sudo snap install --classic certbot
+  sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
-  # Ativar o UFW
-  echo "🚀 Ativando o UFW..."
-  sudo ufw --force enable
+  echo "✅ Configuração concluída!"
 
-  # Instalação do Certbot
+EOF
+
+  sleep 2
+}
+
+system_certbot_install_arm() {
+    print_banner
+  printf "${WHITE} 💻 Agora, vamos instalar e ativar firewall UFW...${GRAY_LIGHT}"
+  printf "\n\n"
+
+  sleep 2
+
+  sudo su - root <<EOF
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 22
+ufw allow 5432
+ufw allow 80
+ufw allow 443
+ufw allow 9000
+ufw --force enable
+echo "{\"iptables\": false}" > /etc/docker/daemon.json
+systemctl restart docker
+sed -i -e 's/DEFAULT_FORWARD_POLICY="DROP"/DEFAULT_FORWARD_POLICY="ACCEPT"/g' /etc/default/ufw
+ufw reload
+wget -q -O /usr/local/bin/ufw-docker https://github.com/chaifeng/ufw-docker/raw/master/ufw-docker
+chmod +x /usr/local/bin/ufw-docker
+ufw-docker install
+systemctl restart ufw
+
+# Instalação do Certbot
   echo "⚙️ Instalando o Certbot..."
   sudo apt-get remove -y certbot
   sudo snap install --classic certbot
@@ -314,83 +350,6 @@ system_certbot_install() {
 EOF
 
   sleep 2
-}
-
-system_certbot_install_arm() {
-    echo "Iniciando configuração do sistema para ARM..."
-
-    # Garantir que o script está sendo executado como root
-    if [ "$(id -u)" -ne 0 ]; then
-        echo "Este script precisa ser executado como root. Use 'sudo su - root' antes de executar."
-        exit 1
-    fi
-
-    echo "Liberando as portas necessárias no firewall..."
-
-    # Liberar portas no iptables
-    ports=(80 443 5432 6379 5672 9000 3000 3333)
-    for port in "${ports[@]}"; do
-        iptables -A INPUT -p tcp --dport "$port" -j ACCEPT
-        echo "Porta $port liberada."
-    done
-
-    # Permitir conexões estabelecidas
-    iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-
-    # Bloquear todo o tráfego não permitido
-    iptables -A INPUT -j REJECT
-
-    echo "Salvando regras do iptables..."
-    apt install -y iptables-persistent
-    netfilter-persistent save
-    netfilter-persistent reload
-
-    echo "Instalando Fail2Ban..."
-
-    # Instalar Fail2Ban
-    apt install -y fail2ban
-
-    # Configuração básica do Fail2Ban
-    cat <<EOF > /etc/fail2ban/jail.local
-[DEFAULT]
-bantime  = 10m
-findtime = 10m
-maxretry = 5
-
-[sshd]
-enabled = true
-
-[nginx-http-auth]
-enabled = true
-EOF
-
-    systemctl enable fail2ban
-    systemctl start fail2ban
-
-    echo "Fail2Ban instalado e configurado."
-
-    echo "Removendo Certbot antigo, se existir..."
-
-    # Remover Certbot antigo
-    apt remove -y certbot python3-certbot-nginx
-    apt autoremove -y
-
-    echo "Instalando Certbot..."
-
-    # Instalar Certbot
-    apt install -y software-properties-common
-    add-apt-repository -y universe
-    apt update -y
-    apt install -y certbot python3-certbot-nginx
-
-    echo "Certbot instalado com sucesso."
-
-    echo "Configurando SSL com Certbot..."
-    
-    # Configuração básica para usar Certbot (requer domínio configurado)
-    certbot --nginx -n --agree-tos --email ${deploy_email}
-
-    echo "Instalação concluída. Firewall configurado, Fail2Ban ativado e Certbot pronto para uso."
 }
 
 #######################################
