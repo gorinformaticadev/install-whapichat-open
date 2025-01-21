@@ -194,19 +194,19 @@ get_deploy_pass() {
   # sleep 2
 }
 
-get_rabbitmq_pass() {
-  print_banner
-  printf "${BLUE}🔐 Gerando automaticamente uma senha para o RabbitMQ...${NC}\n\n"
+# get_rabbitmq_pass() {
+#  print_banner
+#  printf "${BLUE}🔐 Gerando automaticamente uma senha para o RabbitMQ...${NC}\n\n"
 
-  # Gera uma senha aleatória de 12 caracteres alfanuméricos
-  rabbitmq_pass=$(openssl rand -base64 12 | tr -d '/+=' | cut -c1-12)
+#  # Gera uma senha aleatória de 12 caracteres alfanuméricos
+#  rabbitmq_pass=$(openssl rand -base64 12 | tr -d '/+=' | cut -c1-12)
 
-  # Exibe a senha gerada
-  printf "${GREEN}✔️ Senha do RabbitMQ gerada automaticamente:${NC} ${BLUE}${rabbitmq_pass}${NC}\n\n"
+#  # Exibe a senha gerada
+#  printf "${GREEN}✔️ Senha do RabbitMQ gerada automaticamente:${NC} ${BLUE}${rabbitmq_pass}${NC}\n\n"
 
-  # Exporta a senha para que seja usada em outros scripts/processos
-  export rabbitmq_pass
-}
+#  # Exporta a senha para que seja usada em outros scripts/processos
+#  export rabbitmq_pass
+#}
 
 
 get_db_name() {
@@ -383,7 +383,7 @@ get_urls_arm64() {
   get_frontend_url
   get_backend_url
   get_deploy_pass
-  get_redis_pass
+  #get_redis_pass
   get_db_name
   get_db_user
   get_db_pass
@@ -396,7 +396,7 @@ get_urls_arm64() {
   system_puppeteer_dependencies
   system_snapd_install
   system_nginx_install
-  system_certbot_install
+  system_certbot_install_arm
   backend_chromium_arm64
   system_git_clone
   backend_set_env_arm64

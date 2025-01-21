@@ -13,13 +13,13 @@ branchs=main
 
 #MODO DEV
 #branchs=dev
-
+rabbitmq_pass=cPnaZ99zM9rcTSgUGekYoROGXvCaLLQIacaiEL13jiQ
 arquitetura=$(dpkg --print-architecture)
 backend_porta=3000
 frontend_porta=3333
-#deploy_password=password
+redis_pass=XwJHGK6c2nSmGMkh1KXdZkxx2aaaCPRSr3f8nRml
 
-#redis_pass=password
+#deploy_password=password
 
 #postgres_root_password=password
 
