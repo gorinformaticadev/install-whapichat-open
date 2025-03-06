@@ -7,12 +7,8 @@
 jwt_secret=$(openssl rand -base64 32)
 jwt_refresh_secret=$(openssl rand -base64 32)
 
-whapichatdown=https://github.com/gorinformaticadev1/TikTickets-whapichat.git
-#PRODUÇÃO
-branchs=main
-
+whapichatdown=https://github.com/jvkabum/TikTickets-zing.git
 #MODO DEV
-#branchs=dev
 rabbitmq_pass=cPnaZ99zM9rcTSgUGekYoROGXvCaLLQIacaiEL13jiQ
 arquitetura=$(dpkg --print-architecture)
 backend_porta=3000
@@ -25,4 +21,4 @@ redis_pass=XwJHGK6c2nSmGMkh1KXdZkxx2aaaCPRSr3f8nRml
 
 #db_pass=password
 
-#deploy_email=atendimentogor@gmail.com
+#deploy_email=seuemail@gmail.com
